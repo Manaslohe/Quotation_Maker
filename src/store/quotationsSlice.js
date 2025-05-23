@@ -37,19 +37,39 @@ export const quotationsSlice = createSlice({
     updateQuotation: (state, action) => {
       const index = state.items.findIndex(q => q.id === action.payload.id);
       if (index !== -1) {
-        state.items[index] = action.payload;
+        // Make sure we preserve the ID when updating
+        const updatedQuotation = {
+          ...action.payload,
+          id: state.items[index].id
+        };
+        state.items[index] = updatedQuotation;
         saveQuotations(state.items);
       }
     },
     deleteQuotation: (state, action) => {
       state.items = state.items.filter(q => q.id !== action.payload);
       saveQuotations(state.items);
+      
+      // If the deleted quotation was selected, clear the selection
+      if (state.selectedQuotation && state.selectedQuotation.id === action.payload) {
+        state.selectedQuotation = null;
+      }
     },
     setSelectedQuotation: (state, action) => {
       state.selectedQuotation = action.payload;
+    },
+    clearSelectedQuotation: (state) => {
+      state.selectedQuotation = null;
     }
   }
 });
 
-export const { saveQuotation, updateQuotation, deleteQuotation, setSelectedQuotation } = quotationsSlice.actions;
+export const { 
+  saveQuotation, 
+  updateQuotation, 
+  deleteQuotation, 
+  setSelectedQuotation,
+  clearSelectedQuotation 
+} = quotationsSlice.actions;
+
 export default quotationsSlice.reducer;
